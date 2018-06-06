@@ -1,0 +1,80 @@
+-- не собираются стили:
+ls -a  - Список всех файлов, включая скрытые файлы, которые начинаются с '.'.
+make stop - останавливаем все, что запущено
+make start - ??
+git pull - подливаем из репозитория все
+make stop
+make upgrade - быстрый аналог комбинаций команд git pull; make; make restart - для апгрейда
+make modules - ?? миграции
+make loadstatic - подгружаем статику
+make restart - перезапускаем все
+
+
+--- проблема с shared
+порядок действий:
+    cd .. - заходим в домашнюю директорию, где расположениы srs и srs-docker
+    ls    - выдача информации о файлах или каталогах
+    ls l  - Здесь ls-l (l- это не отдельный символ) показывает файл или каталог, размер, дату изменения и время, имя файла или папки и владельца файла и его разрешение.
+    sudo chown -R vilkov:vilkov ./ еняем права доступа от рута на пользоателя
+
+    потом, в srs-docker make upgrade, make modules
+
+
+--- вебпак не компилирует https://jing.reg.ru/180206012711n8ky1.png
+1. git submodule update --init --recursive - выкинет cloudvps/babel ....
+
+2. возможно поможет:
+на хосте грохни srs/node_modules и srs/bower_components, потом cd srs-docker && make node_modules (в ~  прописать sudo rm -rf /home/vilkov/srs/node_modules/
+ )
+и потом уже рестарт всея докера
+
+--- после ТС-ки нельзя залогиниться
+чистим куки локар стор и это https://jing.reg.ru/markin_27-02-2018_11-11-54.png
+make loadtestdb
+еще как вариант кэш редиса сбросить:
+Сброс редиса в докере:
+sudo docker-compose exec redis redis-cli
+127.0.0.1:6379> flushall
+
+
+--- доступ к бд с тски по ssh
+MacBook-Pro-Andrej:~ avarganov$ ssh a.varganov@ts2336.autots.dev.reg.ru
+Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-112-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+ * Management:     https://landscape.canonical.com/
+ * Support:        https://ubuntu.com/advantage
+Last login: Mon Feb 26 17:10:47 2018 from 10.0.1.102
+a.varganov@ts2336:~$ cd /opt/regru/srs-docker/
+a.varganov@ts2336:/opt/regru/srs-docker$ sudo mysql/mylocal-root-exec
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 20
+Server version: 5.7.21-20 Percona Server (GPL), Release '20', Revision 'ed217b06ca3'
+
+Copyright (c) 2009-2018 Percona LLC and/or its affiliates
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> --- тут запросы формируем
+
+--- доступ к бд с локалки
+в srs-docker пишем mysql/mylocal-root-exec и все
+
+
+--- если 502 при попытке авторизоваться https://jing.reg.ru/vilkov_18032110413310%3A41.jpg
+
+make rm; docker pull docker.reg.ru/srsfull; make start  - https://jing.reg.ru/vilkov_18033013422313%3A42.jpg
+
+--- сбросить кэш редиса
+docker-compose exec redis redis-cli
+и уже внутри редиса делаешь flushall
+
+
+
+
